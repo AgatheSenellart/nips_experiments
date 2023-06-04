@@ -19,7 +19,7 @@ Slurm example
 #SBATCH --gres=gpu               # GPU nodes are only available in gpu partition
 #SBATCH --mem=30G                # Total memory allocated
 #SBATCH --hint=multithread       # we get logical cores (threads) not physical (cores)
-#SBATCH --time=20:00:00          # total run time limit (HH:MM:SS)
+#SBATCH --time=25:00:00          # total run time limit (HH:MM:SS)
 #SBATCH --output=%x_%A_%a.out # output file name
 #SBATCH --error=%x_%A_%a.out   # error file name
 
@@ -46,3 +46,8 @@ python expes/mmnist/training/resnets/jmvae.py --param_file config/f${SLURM_ARRAY
 
 ```
 
+J'ai lancé les configurations 1-3 (toutes les expes pour la seed 0) pour jnf, jmvae, jnfd
+et 1-5 (pareil ça correspond aux expes pour la seed 0) pour les modèles aggregés.
+
+Si tu pouvais ce serait cool de faire deux autres seeds :  expes 4-9 pour les modèles joints et
+expes 6-15 pour les modèles aggregés. 
