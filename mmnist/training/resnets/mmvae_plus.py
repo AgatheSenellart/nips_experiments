@@ -79,4 +79,4 @@ save_model(model, args)
 # validate the model #############################################################################################################
 ##################################################################################################################################
 
-eval_model(model, trainer.training_dir, test_data, wandb_cb.run.path)
+eval_model(model, trainer.training_dir,train_data, test_data, wandb_cb.run.path,args.seed)

@@ -25,7 +25,7 @@ train_data, eval_data = random_split(
 
 model_config = MMVAEConfig(
     **base_config, 
-    K=10, 
+    K=8, 
     latent_dim=64,
     prior_and_posterior_dist="laplace_with_softmax",
     learn_prior="False"

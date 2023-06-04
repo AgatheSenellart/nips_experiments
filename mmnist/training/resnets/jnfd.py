@@ -26,7 +26,8 @@ train_data, eval_data = random_split(
 
 model_config = JNFDccaConfig(
     **base_config,
-    warmup=base_training_config["num_epochs"] // 2,
+    latent_dim=128,
+    warmup=200,
     nb_epochs_dcca=200,
     embedding_dcca_dim=20,
 )
@@ -48,9 +49,7 @@ trainer_config = AddDccaTrainerConfig(
     seed=args.seed,
     output_dir=f"compare_on_mmnist/{config_name}/{model.model_name}/seed_{args.seed}/missing_ratio_{args.missing_ratio}/",
 )
-# trainer_config.num_epochs += (
-#     model_config.nb_epochs_dcca
-# )  # Add the DCCA time to overall number of epochs
+trainer_config.num_epochs = 600
 
 # Set up callbacks
 wandb_cb = WandbCallback()

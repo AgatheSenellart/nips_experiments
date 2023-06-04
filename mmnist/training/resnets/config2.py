@@ -292,7 +292,7 @@ def eval_model(model, output_dir, train_data,test_data, wandb_path, seed):
     mod.finish()
 
     # FID evaluator
-    config = FIDEvaluatorConfig(batch_size=512, wandb_path=wandb_path)
+    config = FIDEvaluatorConfig(batch_size=128, wandb_path=wandb_path)
 
     fid = FIDEvaluator(
         model, test_data, output=output_dir, eval_config=config
@@ -320,6 +320,7 @@ def eval_model(model, output_dir, train_data,test_data, wandb_path, seed):
 
     sampler = GaussianMixtureSampler(model)
     sampler.fit(train_data)
+    config = CoherenceEvaluatorConfig(batch_size=512, wandb_path=wandb_path)
 
     module_eval = CoherenceEvaluator(model,load_mmnist_classifiers(),test_data,eval_config=config,sampler=sampler)
     module_eval.joint_coherence()
