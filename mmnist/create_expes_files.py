@@ -30,7 +30,7 @@ for tup in pairs:
         if config["missing_ratio"] == 0 and config["keep_incomplete"]:
             pass
         else:
-            with open(f"{folder}/f{file_nb}.json", "a+") as fp:
+            with open(f"{folder}/f{file_nb}.json", "w+") as fp:
                 json.dump(config, fp)
             file_nb += 1
         
