@@ -42,7 +42,7 @@ trainer_config = BaseTrainerConfig(
     seed=args.seed,
     output_dir=f"compare_on_mmnist/{config_name}/{model.model_name}/seed_{args.seed}/missing_ratio_{args.missing_ratio}/K__{model.K}",
 )
-trainer_config.per_device_train_batch_size = 128
+trainer_config.per_device_train_batch_size = 64
 trainer_config.num_epochs = 50 # enough for this model to reach convergence
 
 # Set up callbacks
