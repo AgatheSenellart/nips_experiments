@@ -71,24 +71,20 @@ import json
 from multivae.models import AutoModel
 
 for seed in range(3):
-    path = f"../reproduce_mmvaep/K__{1}/seed__{seed}/final_model"
+    
+    model = AutoModel.load_from_folder(f'/home/asenella/scratch/reproduce_mmvaep_K__1__seed_{seed}')
 
-    model = AutoModel.load_from_folder(path)
-    model.device = "cuda" if torch.cuda.is_available() else "cpu"
 
-    with open(os.path.join(path, "wandb_info.json")) as fp:
-        wandb_path = json.load(fp)["path"]
-
-    config = CoherenceEvaluatorConfig(batch_size=128, wandb_path=wandb_path)
+    config = CoherenceEvaluatorConfig(batch_size=128)
 
     CoherenceEvaluator(
         model=model,
         test_dataset=test_data,
         classifiers=load_mmnist_classifiers(device=model.device),
-        output=path,
+        output='../validate_mmvap_{i}',
         eval_config=config,
     ).eval()
 
-    config = FIDEvaluatorConfig(batch_size=128, wandb_path=wandb_path)
+    config = FIDEvaluatorConfig(batch_size=128, wandb_path=None)
 
-    fid = FIDEvaluator(model, test_data, output=path, eval_config=config).eval()
+    fid = FIDEvaluator(model, test_data, output='../validate_mmvap_{i}', eval_config=config).eval()

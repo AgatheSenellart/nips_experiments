@@ -26,22 +26,22 @@ train_data, eval_data = random_split(
 
 model_config = MMVAEPlusConfig(
     **base_config,
-    K=1,
-    prior_and_posterior_dist='laplace_with_softmax',
+    K=10,
+    prior_and_posterior_dist='normal',
     learn_shared_prior=False,
     learn_modality_prior=True,
-    beta=2.5,
-    modalities_specific_dim=32,
+    beta=1,
+    modalities_specific_dim=102,
     reconstruction_option="joint_prior",
 )
-model_config.latent_dim = 32
+model_config.latent_dim = 104
 
 ##### Architectures #####
 from multivae.models.nn.mmnist import EncoderConvMMNIST_multilatents,DecoderConvMMNIST
 from multivae.models.base import BaseAEConfig
 
-encoders = {m : EncoderConvMMNIST_multilatents(BaseAEConfig(latent_dim=32, 
-                                                            style_dim=32,
+encoders = {m : EncoderConvMMNIST_multilatents(BaseAEConfig(latent_dim=model_config.latent_dim, 
+                                                            style_dim=model_config.modalities_specific_dim,
                                                             input_dim=(3,28,28))) for m in modalities}
 
 decoders = {m : DecoderConvMMNIST(BaseAEConfig(input_dim=(3,28,28), latent_dim=model_config.latent_dim+

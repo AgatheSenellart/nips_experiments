@@ -58,13 +58,12 @@ import wandb
 id = f'{args.model_name}_{incomplete}_{missing_ratio}_{args.seed}'
 wandb_run = wandb.init(entity="multimodal_vaes",
                        project='validate_mmnist',
-                       config=model.model_config.to_dict(),
-                       id= id if args.model_name !='MVAE' else id + '_new'
+                       config=model.model_config.to_dict()
                        )
 
 wandb.config.update(args)
 
-output_dir = f'./validate_mmnist/{args.model_name}/incomplete_{incomplete}/missing_ratio_{missing_ratio}/'
+output_dir = f'./validate_mmnist/{args.model_name}/incomplete_{incomplete}/missing_ratio_{missing_ratio}/seed_{args.seed}'
 
 # Recompute the cross-coherences and joint coherence from prior and FID if necessary
 config = CoherenceEvaluatorConfig(batch_size=512, wandb_path=wandb_run.path)
