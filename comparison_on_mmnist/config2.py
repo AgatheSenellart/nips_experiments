@@ -26,8 +26,9 @@ from multivae.trainers.base.callbacks import (
 )
 
 # The path to download and store the data, classifiers and inception network for FID.
-data_path = '~/dev/data'
+data_path = './data'
 output_path = 'experiments/'
+use_wandb = False
 
 modalities = ["m0", "m1", "m2", "m3", "m4"]
 
@@ -112,7 +113,7 @@ class ClfImg(nn.Module):
         return h
 
 
-def load_mmnist_classifiers(data_path=data_path, device="cuda"):
+def load_mmnist_classifiers(data_path='./data/clf', device="cuda"):
     clfs = {}
     for i in range(5):
         fp = data_path + "/pretrained_img_to_digit_clf_m" + str(i)

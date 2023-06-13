@@ -42,11 +42,14 @@ trainer_config = TwoStepsTrainerConfig(
 trainer_config.num_epochs = 600 # enough for this model to converge
 
 # Set up callbacks
-wandb_cb = WandbCallback()
-wandb_cb.setup(trainer_config, model_config, project_name=wandb_project)
-wandb_cb.run.config.update(args.__dict__)
+if use_wandb:
+    wandb_cb = WandbCallback()
+    wandb_cb.setup(trainer_config, model_config, project_name=wandb_project)
+    wandb_cb.run.config.update(args.__dict__)
+    callbacks = [TrainingCallback(), ProgressBarCallback(), wandb_cb]
+else:
+    callbacks = None
 
-callbacks = [TrainingCallback(), ProgressBarCallback(), wandb_cb]
 
 # Define the suited two-steps trainer
 trainer = TwoStepsTrainer(

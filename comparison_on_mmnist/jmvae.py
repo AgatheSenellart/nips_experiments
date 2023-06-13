@@ -42,11 +42,14 @@ trainer_config = BaseTrainerConfig(
 )
 
 # Set up callbacks
-wandb_cb = WandbCallback()
-wandb_cb.setup(trainer_config, model_config, project_name=wandb_project)
-wandb_cb.run.config.update(args.__dict__)
 
-callbacks = [TrainingCallback(), ProgressBarCallback(), wandb_cb]
+if use_wandb:
+    wandb_cb = WandbCallback()
+    wandb_cb.setup(trainer_config, model_config, project_name=wandb_project)
+    wandb_cb.run.config.update(args.__dict__)
+    callbacks = [TrainingCallback(), ProgressBarCallback(), wandb_cb]
+else:
+    callbacks = None
 
 trainer = BaseTrainer(
     model,

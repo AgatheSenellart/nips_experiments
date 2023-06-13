@@ -13,7 +13,6 @@ import numpy as np
 import torch
 from config2 import *
 from huggingface_hub import CommitOperationAdd, HfApi
-import wandb
 from torch import nn
 from torch.utils.data import DataLoader
 from tqdm import tqdm
@@ -60,16 +59,12 @@ else :
 
 
 id = f'{args.model_name}_{incomplete}_{missing_ratio}_{args.seed}'
-wandb_run = wandb.init(project='validate_mmnist',
-                       config=model.model_config.to_dict()
-                       )
 
-wandb.config.update(args)
 
 output_dir = f'{output_path}/validate_mmnist/{args.model_name}/incomplete_{incomplete}/missing_ratio_{missing_ratio}/seed_{args.seed}'
 
 # Recompute the cross-coherences and joint coherence from prior and FID if necessary
-config = CoherenceEvaluatorConfig(batch_size=512, wandb_path=wandb_run.path)
+config = CoherenceEvaluatorConfig(batch_size=512)
 
 CoherenceEvaluator(
     model=model,

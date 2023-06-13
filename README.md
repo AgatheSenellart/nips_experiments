@@ -26,10 +26,13 @@ To launch the training of a model with the config contained in f1.json, run (fro
 python comparison_on_mmnist/jmvae.py --param_file comparison_on_mmnist/config/f1.json
 ```
 
+# Running evaluation on pretrained models
+
 
 ## Reproduce experiments 
 
 Make sure to download pretrained classifiers for evaluation whenever it is needed.
+
 
 |Dataset| Path to download classifiers|
 |:--:|:--:|

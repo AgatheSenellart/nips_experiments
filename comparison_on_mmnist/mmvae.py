@@ -43,11 +43,14 @@ trainer_config.per_device_train_batch_size = 32
 trainer_config.num_epochs = 100 # enough for this model to reach convergence
 
 # Set up callbacks
-wandb_cb = WandbCallback()
-wandb_cb.setup(trainer_config, model_config, project_name=wandb_project)
-wandb_cb.run.config.update(args.__dict__)
+if use_wandb:
+    wandb_cb = WandbCallback()
+    wandb_cb.setup(trainer_config, model_config, project_name=wandb_project)
+    wandb_cb.run.config.update(args.__dict__)
+    callbacks = [TrainingCallback(), ProgressBarCallback(), wandb_cb]
+else:
+    callbacks = None
 
-callbacks = [TrainingCallback(), ProgressBarCallback(), wandb_cb]
 
 trainer = BaseTrainer(
     model,
