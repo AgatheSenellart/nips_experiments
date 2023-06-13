@@ -75,7 +75,7 @@ CoherenceEvaluator(
 ).eval()
 
 # Visualize unconditional samples and conditional samples too
-vis_config = VisualizationConfig(wandb_path = wandb_run.path,n_samples=8, n_data_cond=10)
+vis_config = VisualizationConfig(n_samples=8, n_data_cond=10)
 vis_module = Visualization(model, test_set,eval_config=vis_config,output = output_dir)
 vis_module.eval()
 
@@ -87,7 +87,7 @@ for i in range(2,5):
 vis_module.finish()
 
 # Compute confiditional FIDs
-fid_config = FIDEvaluatorConfig(batch_size=128, wandb_path=wandb_run.path)
+fid_config = FIDEvaluatorConfig(batch_size=128)
 
 FIDEvaluator(
         model, test_set, output=output_dir, eval_config=fid_config
@@ -120,14 +120,14 @@ gmm_sampler.fit(train_set)
 samplers = [maf_sampler, gmm_sampler]
 
 for sampler in samplers:
-    config = CoherenceEvaluatorConfig(batch_size=128, wandb_path=wandb_run.path)
+    config = CoherenceEvaluatorConfig(batch_size=128)
     module_eval = CoherenceEvaluator(model,load_mmnist_classifiers(),test_set, eval_config=config,sampler=sampler)
     module_eval.joint_coherence()
     module_eval.log_to_wandb()
     module_eval.finish()
 
 
-    config = FIDEvaluatorConfig(batch_size=128, wandb_path=wandb_run.path, inception_weights_path='../../fid_model/model.pt')
+    config = FIDEvaluatorConfig(batch_size=128, inception_weights_path='./data/clf/pt_inception-2015-12-05-6726825d.pth')
     module_eval = FIDEvaluator(model,test_set,eval_config=config, sampler=sampler)
     module_eval.eval()
     module_eval.finish()
@@ -139,7 +139,7 @@ from multivae.metrics import Clustering, ClusteringConfig
 
 c_config = ClusteringConfig(number_of_runs=10,
     num_samples_for_fit=None, 
-    wandb_path=wandb_run.path)
+   )
 c = Clustering(model, test_set, train_set,eval_config=c_config)
 c.eval()
 c.finish()
@@ -149,7 +149,7 @@ from multivae.metrics import LikelihoodsEvaluator, LikelihoodsEvaluatorConfig
 
 lik_config = LikelihoodsEvaluatorConfig(
     batch_size=512,
-    wandb_path=wandb_run.path,
+   
     num_samples=1000,
     batch_size_k=250,
 )

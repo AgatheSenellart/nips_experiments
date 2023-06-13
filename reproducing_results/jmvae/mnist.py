@@ -15,6 +15,7 @@ from multivae.trainers.base.callbacks import ProgressBarCallback, WandbCallback
 ######################################################
 ### Encoders & Decoders
 
+
 parser = argparse.ArgumentParser()
 parser.add_argument("--seed", default=8)
 args = parser.parse_args()
@@ -156,8 +157,8 @@ class LabelsDecoder(BaseDecoder):
 ######################################################
 ### Dataset
 
-train_set = MnistLabels(data_path="../data", split="train", download=True)
-test_set = MnistLabels(data_path="../data", split="test",download=True)
+train_set = MnistLabels(data_path="./data", split="train", download=True)
+test_set = MnistLabels(data_path="./data", split="test",download=True)
 
 ######################################################
 ### Model

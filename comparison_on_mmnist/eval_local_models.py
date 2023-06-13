@@ -1,6 +1,6 @@
 """
 
-Script to compute more evaluation metrics on the MMNIST experiments
+Script to compute evaluation metrics on the MMNIST experiments
 
 """
 
@@ -33,24 +33,10 @@ from config2 import *
 train_set = MMNISTDataset(data_path=data_path, split="train", download = True)
 test_set = MMNISTDataset(data_path=data_path, split="test", download = True)
 
-# Get config_files
-parser = argparse.ArgumentParser()
-parser.add_argument("--param_file", type=str)
-parser.add_argument("--model_name", type=str)
-args = parser.parse_args()
 
-with open(args.param_file, "r") as fp:
-    info = json.load(fp)
-info['model_name'] = args.model_name
-args = argparse.Namespace(**info)
-
-missing_ratio = "".join(str(args.missing_ratio).split("."))
-incomplete = "i" if args.keep_incomplete else "c"
-
-# Load the latest model 
-model_path = f"{output_path}/compare_on_mmnist/{config_name}/{args.model_name}/seed_{args.seed}/missing_ratio_{args.missing_ratio}/"
-model_path = max(os.listdir(model_path),key=os.path.getmtime)
-model = AutoModel.load_from_folder(os.path.join(model_path,'final_model'))
+# Load model from a folder
+model_path = "path_to_your_model"
+model = AutoModel.load_from_folder(model_path)
 
 if torch.cuda.is_available():   
     model = model.cuda()
@@ -60,17 +46,10 @@ else :
     model.device ='cpu'
 
 
-id = f'{args.model_name}_{incomplete}_{missing_ratio}_{args.seed}'
-wandb_run = wandb.init(project='validate_mmnist',
-                       config=model.model_config.to_dict()
-                       )
-
-wandb.config.update(args)
-
-output_dir = f'{output_path}/validate_mmnist/{args.model_name}/incomplete_{incomplete}/missing_ratio_{missing_ratio}/seed_{args.seed}'
+output_dir = os.path.join(model_path, 'validate')
 
 # Recompute the cross-coherences and joint coherence from prior and FID if necessary
-config = CoherenceEvaluatorConfig(batch_size=512, wandb_path=wandb_run.path)
+config = CoherenceEvaluatorConfig(batch_size=128)
 
 CoherenceEvaluator(
     model=model,
@@ -81,7 +60,7 @@ CoherenceEvaluator(
 ).eval()
 
 # Visualize unconditional samples and conditional samples too
-vis_config = VisualizationConfig(wandb_path = wandb_run.path,n_samples=8, n_data_cond=10)
+vis_config = VisualizationConfig(n_samples=8, n_data_cond=10)
 vis_module = Visualization(model, test_set,eval_config=vis_config,output = output_dir)
 vis_module.eval()
 
@@ -93,7 +72,7 @@ for i in range(2,5):
 vis_module.finish()
 
 # Compute confiditional FIDs
-fid_config = FIDEvaluatorConfig(batch_size=128, wandb_path=wandb_run.path)
+fid_config = FIDEvaluatorConfig(batch_size=128)
 
 FIDEvaluator(
         model, test_set, output=output_dir, eval_config=fid_config
@@ -126,14 +105,14 @@ gmm_sampler.fit(train_set)
 samplers = [maf_sampler, gmm_sampler]
 
 for sampler in samplers:
-    config = CoherenceEvaluatorConfig(batch_size=128, wandb_path=wandb_run.path)
+    config = CoherenceEvaluatorConfig(batch_size=128)
     module_eval = CoherenceEvaluator(model,load_mmnist_classifiers(),test_set, eval_config=config,sampler=sampler)
     module_eval.joint_coherence()
     module_eval.log_to_wandb()
     module_eval.finish()
 
 
-    config = FIDEvaluatorConfig(batch_size=128, wandb_path=wandb_run.path, inception_weights_path='../../fid_model/model.pt')
+    config = FIDEvaluatorConfig(batch_size=128, inception_weights_path='./data/clf/pt_inception-2015-12-05-6726825d.pth')
     module_eval = FIDEvaluator(model,test_set,eval_config=config, sampler=sampler)
     module_eval.eval()
     module_eval.finish()
@@ -145,7 +124,7 @@ from multivae.metrics import Clustering, ClusteringConfig
 
 c_config = ClusteringConfig(number_of_runs=10,
     num_samples_for_fit=None, 
-    wandb_path=wandb_run.path)
+    )
 c = Clustering(model, test_set, train_set,eval_config=c_config)
 c.eval()
 c.finish()
@@ -155,7 +134,6 @@ from multivae.metrics import LikelihoodsEvaluator, LikelihoodsEvaluatorConfig
 
 lik_config = LikelihoodsEvaluatorConfig(
     batch_size=512,
-    wandb_path=wandb_run.path,
     num_samples=1000,
     batch_size_k=250,
 )
