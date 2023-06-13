@@ -106,7 +106,7 @@ class DecoderImg(BaseDecoder):
         )  # NOTE: consider learning scale param, too
 
 
-train_data = MMNISTDataset(data_path="~/scratch/data", split="train")
+train_data = MMNISTDataset(data_path="./data", split="train")
 
 
 modalities = ["m0", "m1", "m2", "m3", "m4"]
@@ -145,13 +145,16 @@ trainer_config = BaseTrainerConfig(
     per_device_train_batch_size=256,
     drop_last=True,
     seed=args.seed,
+    output_dir='./reproduce_mvtcae'
 )
 
 # Set up callbacks
-wandb_cb = WandbCallback()
-wandb_cb.setup(trainer_config, model_config, project_name="reproducing_mvtcae")
+callbacks = None
 
-callbacks = [TrainingCallback(), ProgressBarCallback(), wandb_cb]
+# Uncomment the lines below if you want to use wandb 
+# wandb_cb = WandbCallback()
+# wandb_cb.setup(trainer_config, model_config, project_name="reproducing_mvtcae")
+# callbacks = [TrainingCallback(), ProgressBarCallback(), wandb_cb]
 
 trainer = BaseTrainer(
     model,
@@ -161,7 +164,6 @@ trainer = BaseTrainer(
 )
 trainer.train()
 
-trainer._best_model.push_to_hf_hub(f"asenella/reproducing_mvtcae_seed_{args.seed}")
 
 
 ##################################################################
@@ -213,7 +215,7 @@ class ClfImg(nn.Module):
         return h
 
 
-def load_mmnist_classifiers(data_path="../../../data/clf", device="cuda"):
+def load_mmnist_classifiers(data_path="./data/clf", device="cuda"):
     clfs = {}
     for i in range(5):
         fp = data_path + "/pretrained_img_to_digit_clf_m" + str(i)
@@ -229,7 +231,7 @@ def load_mmnist_classifiers(data_path="../../../data/clf", device="cuda"):
 
 ##############################################################################
 
-test_set = MMNISTDataset(data_path="~/scratch/data", split="test")
+test_set = MMNISTDataset(data_path="./data", split="test", download=True)
 
 data_path = trainer.training_dir
 

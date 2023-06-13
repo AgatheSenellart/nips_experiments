@@ -8,10 +8,11 @@ from torch import nn
 from multivae.data.datasets.mmnist import MMNISTDataset
 from multivae.models.base.base_model import BaseDecoder, BaseEncoder, ModelOutput
 from multivae.trainers.base.callbacks import ProgressBarCallback, WandbCallback
+from multivae.models import AutoModel
 
 ######## Dataset #########
 
-test_data = MMNISTDataset(data_path="~/scratch/data", split="test")
+test_data = MMNISTDataset(data_path="./data", split="test", download=True)
 
 
 #### Validation ####
@@ -66,25 +67,21 @@ def load_mmnist_classifiers(data_path="/home/asenella/scratch/data/clf", device=
     return clfs
 
 
-import json
 
-from multivae.models import AutoModel
-
-for seed in range(3):
-    
-    model = AutoModel.load_from_folder(f'/home/asenella/scratch/reproduce_mmvaep_K__1__seed_{seed}')
+# Give the path to your trained model
+model = AutoModel.load_from_folder('path_to_the_model_you_want_to_evaluate')
 
 
-    config = CoherenceEvaluatorConfig(batch_size=128)
+config = CoherenceEvaluatorConfig(batch_size=128)
 
-    CoherenceEvaluator(
-        model=model,
-        test_dataset=test_data,
-        classifiers=load_mmnist_classifiers(device=model.device),
-        output='../validate_mmvap_{i}',
-        eval_config=config,
-    ).eval()
+CoherenceEvaluator(
+    model=model,
+    test_dataset=test_data,
+    classifiers=load_mmnist_classifiers(device=model.device),
+    output='./validate_mmvae_plus',
+    eval_config=config,
+).eval()
 
-    config = FIDEvaluatorConfig(batch_size=128, wandb_path=None)
+config = FIDEvaluatorConfig(batch_size=128, wandb_path=None)
 
-    fid = FIDEvaluator(model, test_data, output='../validate_mmvap_{i}', eval_config=config).eval()
+fid = FIDEvaluator(model, test_data, output='./validate_mmvae_plus', eval_config=config).eval()

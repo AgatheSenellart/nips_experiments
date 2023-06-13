@@ -142,8 +142,8 @@ class DecoderSVHN(BaseDecoder):
 ########### Load the dataset, configure model and training ########################
 
 # Dataset
-train_set = MnistSvhn(split="train", data_multiplication=30)
-test_set = MnistSvhn(split="test", data_multiplication=30)
+train_set = MnistSvhn(data_path = './',split="train", data_multiplication=30,download=True)
+test_set = MnistSvhn(data_path = './',split="test", data_multiplication=30, download=True)
 
 
 print(f"train : {len(train_set)}, test : {len(test_set)}")
@@ -185,6 +185,7 @@ training_config = BaseTrainerConfig(
     optimizer_cls="Adam",
     optimizer_params={"amsgrad": True},
     steps_predict=1,
+    output_dir='./reproduce_mmvae'
 )
 
 # Set up callbacks
@@ -203,17 +204,4 @@ trainer = BaseTrainer(
 
 trainer.train()
 
-trainer._best_model.push_to_hf_hub("asenella/reproducing_mmvae_5")
 
-#### Validate ####
-
-lik_config = LikelihoodsEvaluatorConfig(
-    batch_size=12,
-    batch_size_k=1000,
-    unified_implementation=False,
-    num_samples=1000,
-    wandb_path=wandb_cb.run.path,
-)
-output = LikelihoodsEvaluator(
-    model, test_set, trainer.training_dir, eval_config=lik_config
-).eval()

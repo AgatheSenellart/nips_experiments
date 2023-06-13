@@ -4,32 +4,27 @@ from classifiers import load_mnist_svhn_classifiers
 from multivae.data.datasets.mnist_svhn import MnistSvhn
 from multivae.metrics import (
     CoherenceEvaluator,
-    LikelihoodsEvaluator,
-    LikelihoodsEvaluatorConfig,
+   CoherenceEvaluatorConfig
 )
 from multivae.models import AutoModel
 
-# data_path = "dummy_output_dir/mmvae/final_model"
-# model = AutoModel.load_from_folder(data_path)
-
-data_path = None
-model = AutoModel.load_from_hf_hub(
-    "asenella/reproduce_mmvae_azure_lake", allow_pickle=True
-)
-
 device = "cuda" if torch.cuda.is_available() else "cpu"
-print(model.prior_mean, model.prior_log_var)
 
-clfs = load_mnist_svhn_classifiers("../../classifiers", device=device)
+model = AutoModel.load_from_hf_hub("asenella/reproduce_mmvae_model", allow_pickle=True)
+
+# TO perform evaluation on one of your trained model, uncomment the lines below
+# model_path = path_to_your_model # set the model_name here
+# model = AutoModel.load_from_folder(model_path)
+
+model = model.to(device)
+model.device = device
+
+# Make sure you download the pretrained classifiers and set the path right
+clfs = load_mnist_svhn_classifiers("path/to/classifiers", device=device)
 
 test_set = MnistSvhn(split="test", data_multiplication=30)
-print(len(test_set))
-# output = CoherenceEvaluator(model, clfs, test_set, data_path).joint_coherence()
+eval_config = CoherenceEvaluatorConfig(batch_size=128,nb_samples_for_joint=10000)
+module = CoherenceEvaluator(model, clfs, test_set, eval_config=eval_config)
+module.eval()
+module.finish()
 
-lik_config = LikelihoodsEvaluatorConfig(
-    batch_size=12, batch_size_k=1000, unified_implementation=False, num_samples=1000
-)
-output = LikelihoodsEvaluator(
-    model, test_set, data_path, eval_config=lik_config
-).joint_nll()
-# output = CoherenceEvaluator(model,clfs,test_set,data_path).eval()

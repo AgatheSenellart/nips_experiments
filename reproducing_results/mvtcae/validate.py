@@ -50,7 +50,7 @@ class ClfImg(nn.Module):
         return h
 
 
-def load_mmnist_classifiers(data_path="../../../data/clf", device="cuda"):
+def load_mmnist_classifiers(data_path="./data/clf", device="cuda"):
     clfs = {}
     for i in range(5):
         fp = data_path + "/pretrained_img_to_digit_clf_m" + str(i)
@@ -66,17 +66,18 @@ def load_mmnist_classifiers(data_path="../../../data/clf", device="cuda"):
 
 ##############################################################################
 
-test_set = MMNISTDataset(data_path="~/scratch/data", split="test")
+test_set = MMNISTDataset(data_path="./data", split="test", download=True)
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
-clfs = load_mmnist_classifiers("/home/asenella/scratch/data/clf", device=device)
-for seed in range(3):
-    model = AutoModel.load_from_hf_hub(
-        f"asenella/reproducing_mvtcae_seed_{seed}", allow_pickle=True
-    )
-    # model = AutoModel.load_from_folder(data_path)
+clfs = load_mmnist_classifiers("./data/clf", device=device)
 
-    coherences = CoherenceEvaluator(model, clfs, test_set, None).eval()
+model = AutoModel.load_from_hf_hub(
+    f"asenella/reproducing_mvtcae_seed_0", allow_pickle=True
+)
+# To test on your own trained model, uncomment the line below
+# model = AutoModel.load_from_folder("path_to_your_trained_model")
+
+coherences = CoherenceEvaluator(model, clfs, test_set, None).eval()
 
 fids = FIDEvaluator(model,test_set).mvtcae_reproduce_fids(gen_mod='m0')

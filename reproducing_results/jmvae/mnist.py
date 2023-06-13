@@ -156,8 +156,8 @@ class LabelsDecoder(BaseDecoder):
 ######################################################
 ### Dataset
 
-train_set = MnistLabels(data_path="../../../data", split="train")
-test_set = MnistLabels(data_path="../../../data", split="test")
+train_set = MnistLabels(data_path="../data", split="train", download=True)
+test_set = MnistLabels(data_path="../data", split="test",download=True)
 
 ######################################################
 ### Model
@@ -197,10 +197,14 @@ training_config = BaseTrainerConfig(
     steps_predict=5,
     seed=args.seed,
     learning_rate=1e-3,
+    output_dir='./reproduce_jmvae'
 )
-wandb_ = WandbCallback()
-wandb_.setup(training_config, model_config, project_name="reproduce_jmvae")
-callbacks = [wandb_, ProgressBarCallback()]
+
+# If you want to use wandb, uncomment the line below
+callbacks=None
+# wandb_ = WandbCallback()
+# wandb_.setup(training_config, model_config, project_name="reproduce_jmvae")
+# callbacks = [wandb_, ProgressBarCallback()]
 
 trainer = BaseTrainer(
     model,
@@ -211,8 +215,6 @@ trainer = BaseTrainer(
 )
 
 trainer.train()
-
-trainer._best_model.push_to_hf_hub(f"asenella/reproduce_jmvae_seed_{args.seed}")
 
 
 ############################################################
@@ -225,7 +227,7 @@ from multivae.models import AutoModel
 model = trainer._best_model
 
 ll_config = LikelihoodsEvaluatorConfig(
-    K=1000, unified_implementation=False, wandb_path=wandb_.run.path
+    K=1000, unified_implementation=False
 )
 
 ll_module = LikelihoodsEvaluator(model, test_set, eval_config=ll_config)

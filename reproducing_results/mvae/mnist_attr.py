@@ -159,10 +159,10 @@ model = MVAE(model_config, encoders, decoders)
 ### Dataset
 
 train_set = MnistLabels(
-    data_path="../data", split="train", random_binarized=True, download=True
+    data_path="./data", split="train", random_binarized=True, download=True
 )
 test_set = MnistLabels(
-    data_path="../data", split="test", random_binarized=True, download=True
+    data_path="./data", split="test", random_binarized=True, download=True
 )
 
 ##############################################################
@@ -178,9 +178,12 @@ training_config = BaseTrainerConfig(
     learning_rate=1e-3,
     seed=args.seed,
 )
-wandb_ = WandbCallback()
-wandb_.setup(training_config, model_config, project_name="reproduce_mvae_mnist")
-callbacks = [wandb_, ProgressBarCallback()]
+callbacks = None
+
+# Uncommment the lines below to use wandb
+# wandb_ = WandbCallback()
+# wandb_.setup(training_config, model_config, project_name="reproduce_mvae_mnist")
+# callbacks = [wandb_, ProgressBarCallback()]
 
 trainer = BaseTrainer(
     model,
@@ -193,14 +196,11 @@ trainer = BaseTrainer(
 
 trainer.train()
 
-trainer._best_model.push_to_hf_hub(f"asenella/reproduce_mvae_mnist_{args.seed}")
-
-
 ###############################################################################
 ###### Validate #############
 
 ll_config = LikelihoodsEvaluatorConfig(
-    batch_size=512, K=1000, batch_size_k=500, wandb_path=wandb_.run.path
+    batch_size=128, K=1000, batch_size_k=500
 )
 
 ll_module = LikelihoodsEvaluator(model, test_set, eval_config=ll_config)

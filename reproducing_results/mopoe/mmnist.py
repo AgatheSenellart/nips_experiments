@@ -112,7 +112,7 @@ class DecoderImg(BaseDecoder):
 ### Dataset ###
 
 
-train_data = MMNISTDataset(data_path="~/scratch/data", split="train")
+train_data = MMNISTDataset(data_path="./data", split="train", download=True)
 
 print(len(train_data))
 
@@ -154,10 +154,11 @@ trainer_config = BaseTrainerConfig(
 )
 
 # Set up callbacks
-wandb_cb = WandbCallback()
-wandb_cb.setup(trainer_config, model_config, project_name="reproducing_mopoe")
-
-callbacks = [TrainingCallback(), ProgressBarCallback(), wandb_cb]
+callbacks = None
+# Uncomment below to use wandb
+# wandb_cb = WandbCallback()
+# wandb_cb.setup(trainer_config, model_config, project_name="reproducing_mopoe")
+# callbacks = [TrainingCallback(), ProgressBarCallback(), wandb_cb]
 
 trainer = BaseTrainer(
     model,
@@ -168,7 +169,6 @@ trainer = BaseTrainer(
 
 trainer.train()
 
-trainer._best_model.push_to_hf_hub(f"asenella/reproducing_mopoe_seed_{args.seed}")
 
 #####################################################################################
 ##### Validation
@@ -223,7 +223,7 @@ class ClfImg(nn.Module):
         return h
 
 
-def load_mmnist_classifiers(data_path="../../../data/clf", device="cuda"):
+def load_mmnist_classifiers(data_path="./data/clf", device="cuda"):
     clfs = {}
     for i in range(5):
         fp = data_path + "/pretrained_img_to_digit_clf_m" + str(i)
@@ -239,19 +239,16 @@ def load_mmnist_classifiers(data_path="../../../data/clf", device="cuda"):
 
 ##############################################################################
 
-test_set = MMNISTDataset(data_path="~/scratch/data", split="test")
+test_set = MMNISTDataset(data_path="./data", split="test", download = True)
 
 data_path = trainer.training_dir
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
-clfs = load_mmnist_classifiers(device=device)
+
+# Make sure you have the classifiers in the right path
+clfs = load_mmnist_classifiers(data_path = './data',device=device)
 model = trainer._best_model
 
 coherences = CoherenceEvaluator(model, clfs, test_set, data_path).eval()
 
-nll_config = LikelihoodsEvaluatorConfig(K=15, batch_size_k=15)
 
-# nlls = LikelihoodsEvaluator(model, test_set, data_path, nll_config).eval()
-nlls = LikelihoodsEvaluator(
-    model, test_set, data_path, nll_config
-).reproduce_mopoe_graph()

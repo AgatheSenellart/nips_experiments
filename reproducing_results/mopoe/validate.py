@@ -48,7 +48,7 @@ class ClfImg(nn.Module):
         return h
 
 
-def load_mmnist_classifiers(data_path="/home/asenella/scratch/data/clf", device="cuda"):
+def load_mmnist_classifiers(data_path="./data/clf", device="cuda"):
     clfs = {}
     for i in range(5):
         fp = data_path + "/pretrained_img_to_digit_clf_m" + str(i)
@@ -64,25 +64,21 @@ def load_mmnist_classifiers(data_path="/home/asenella/scratch/data/clf", device=
 
 ##############################################################################
 
-test_set = MMNISTDataset(data_path="~/scratch/data", split="test")
-
+test_set = MMNISTDataset(data_path="./data", split="test", download=True)
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
-clfs = load_mmnist_classifiers(device=device)
-for seed in range(3):
-    data_path = None
-    model = AutoModel.load_from_hf_hub(
-        f"asenella/reproducing_mopoe_seed_{seed}", allow_pickle=True
-    )
 
-    coherences = CoherenceEvaluator(model, clfs, test_set, data_path).eval()
+# Make sure you have the classifiers in the right path
+clfs = load_mmnist_classifiers(data_path = './data/clf', device=device)
 
-# nll_config = LikelihoodsEvaluatorConfig(num_samples=12,
-#                                         batch_size_k=12,
-#                                         unified_implementation=False,
-#                                         wandb_path='multimodal_vaes/reproducing_mopoe/345cw5e3',
-#                                         )
+model = AutoModel.load_from_hf_hub(
+    f"asenella/reproducing_mopoe_seed_0", allow_pickle=True
+)
 
-# nlls = LikelihoodsEvaluator(
-#     model, test_set, data_path, nll_config
-# ).eval()
+# To evaluate on your own model, uncommment the line below :
+# model = AutoModel.load_from_folder("path_to_your_tra ined_model")
+
+model = model.to(device)
+model.device=device
+
+coherences = CoherenceEvaluator(model, clfs, test_set, None).eval()

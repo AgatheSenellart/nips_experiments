@@ -203,8 +203,8 @@ model = MMVAEPlus(model_config, encoders, decoders)
 
 ######## Dataset #########
 
-train_data = MMNISTDataset(data_path="~/scratch/data", split="train")
-test_data = MMNISTDataset(data_path="~/scratch/data", split="test")
+train_data = MMNISTDataset(data_path="./data", split="train", download=True)
+test_data = MMNISTDataset(data_path="./data", split="test", download=True)
 
 
 ########## Training #######
@@ -215,7 +215,7 @@ training_config = BaseTrainerConfig(
     per_device_eval_batch_size=32,
     num_epochs=50 if model_config.K == 10 else 150,
     learning_rate=1e-3,
-    output_dir=f"../reproduce_mmvaep/K__{model_config.K}/seed__{args.seed}",
+    output_dir=f"./reproduce_mmvaep/K__{model_config.K}/seed__{args.seed}",
     steps_predict=5,
     optimizer_cls="Adam",
     optimizer_params=dict(amsgrad=True),
@@ -223,10 +223,12 @@ training_config = BaseTrainerConfig(
 )
 
 # Set up callbacks
-wandb_cb = WandbCallback()
-wandb_cb.setup(training_config, model_config, project_name="reproducing_mmvae_plus")
+callbacks = None
 
-callbacks = [ProgressBarCallback(), wandb_cb]
+#####  Uncomment the lines below if you want to use wandb monitoring
+# wandb_cb = WandbCallback()
+# wandb_cb.setup(training_config, model_config, project_name="reproducing_mmvae_plus")
+# callbacks = [ProgressBarCallback(), wandb_cb]
 
 trainer = BaseTrainer(
     model=model,
@@ -237,11 +239,6 @@ trainer = BaseTrainer(
 )
 
 trainer.train()
-
-trainer._best_model.push_to_hf_hub(
-    f"asenella/reproduce_mmvaep_K__{args.K}__seed_{args.seed}"
-)
-
 
 #### Validation ####
 from multivae.metrics.coherences import CoherenceEvaluator, CoherenceEvaluatorConfig
@@ -280,8 +277,8 @@ class ClfImg(nn.Module):
         # return F.log_softmax(h, dim=-1)
         return h
 
-
-def load_mmnist_classifiers(data_path="/home/asenella/scratch/data/clf", device="cuda"):
+# Make sure, you have the classifiers in the right path 
+def load_mmnist_classifiers(data_path="./data/clf", device="cuda"):
     clfs = {}
     for i in range(5):
         fp = data_path + "/pretrained_img_to_digit_clf_m" + str(i)
@@ -295,7 +292,7 @@ def load_mmnist_classifiers(data_path="/home/asenella/scratch/data/clf", device=
     return clfs
 
 
-config = CoherenceEvaluatorConfig(batch_size=512, wandb_path=wandb_cb.run.path)
+config = CoherenceEvaluatorConfig(batch_size=128)
 
 CoherenceEvaluator(
     model=model,
@@ -305,7 +302,8 @@ CoherenceEvaluator(
     eval_config=config,
 ).eval()
 
-config = FIDEvaluatorConfig(batch_size=512, wandb_path=wandb_cb.run.path)
+# Make sure you have the FID weights in the right path
+config = FIDEvaluatorConfig(batch_size=512, inception_weights_path='./data')
 
 fid = FIDEvaluator(
     model, test_data, output=trainer.training_dir, eval_config=config
