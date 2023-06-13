@@ -111,4 +111,23 @@ In that case, you need to have wandb installed.
 pip install wandb
 ```
 
+## MMVAE+ on partial data example
 
+Move into the nips_experiments folder and run:
+```bash 
+
+python example_mmvae_plus/mmvae_plus.py --param_file comparison_on_mmnist/config/f1.json
+```
+You can change the configuration file number (f2.json, f3.json), to change the context of the experiments; the parameter $\eta$, the
+`keep_incomplete` variable and the seed.
+
+Once again, if you wish to use wandb, uncomment the following lines in the `mmvae_plus.py`file:
+
+```python
+##### Set up callbacks: Uncomment the following lines to use wandb
+callbacks = None
+# wandb_cb = WandbCallback()
+# wandb_cb.setup(trainer_config, model_config)
+# wandb_cb.run.config.update(args.__dict__)
+# callbacks = [TrainingCallback(), ProgressBarCallback(), wandb_cb]
+```
