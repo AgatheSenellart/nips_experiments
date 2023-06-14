@@ -76,9 +76,9 @@ and then run
 python comparison_on_mmnist/eval_local_models.py 
 ```
 
-## Reproduce experiments 
+# Reproduce experiments 
 
-### Setup
+## Setup
 Make sure to download pretrained classifiers for evaluation whenever it is needed and place it in the `nips_experiments/data` folder.
 
 |Dataset| Path to download classifiers|
@@ -87,7 +87,7 @@ Make sure to download pretrained classifiers for evaluation whenever it is neede
 |MMNIST |https://zenodo.org/record/4899160#.ZGeXzy0isf_|
 
 
-### How to run experiments ?
+## How to run experiments ?
 
 For each model, and experiment file and a validate file are available. 
 The experiment script has the name of the dataset it uses. 
@@ -120,7 +120,7 @@ In that case, you need to have wandb installed.
 pip install wandb
 ```
 
-## MMVAE+ on partial data example
+# MMVAE+ on partial data example
 
 Move into the nips_experiments folder and run:
 ```bash 
