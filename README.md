@@ -2,18 +2,19 @@
 This repository contains all the necessary files to reproduce the experiments presented in our 
 paper *MultiVae : A Python library for reproducible and unified Multimodal Generative Autoencoders implementations*. 
 
-## Setup
+# Setup
 
 All you need is in our MultiVae package. You can install it by running:
 
 ```
 git clone https://github.com/AgatheSenellart/multimodal_vaes.git
 cd multimodal_vaes
-pip install .
+pip install -e .
+git checkout samplers
 ```
 
 
-## Comparison on PolyMNIST
+# Comparison on PolyMNIST
 
 When running the comparison on PolyMNIST, you will have the following tree structure. 
 The *data* folder will be downloaded automatically when running an experiment for the first time.
@@ -25,15 +26,16 @@ __nips_experiments
         |__ ...
     |__reproducing_results
         |__ ...
+    |__example_mmvae_plus
     |__data
         |__ MMNIST
         |__ clf
         |__ pt_inception-2015-12-05-6726825d.pth
 ```
-### Training
+## Training
         
-The folders `config`and `config_only_incomplete` contains the information of the missing ratio parameter $(1-\eta)$, 
-`keep_incomplete` variable and the seed. 
+The folders `config` and `config_only_incomplete` contains the information of the missing ratio parameter $(1-\eta)$, 
+`keep_incomplete` variable (True, if the training takes the incomplete samples into consideration, False if those are discarded) and the seed. 
 
 To launch the training of a model with the config contained in f1.json, move into the nips_experiments folder and run:
 
@@ -48,7 +50,7 @@ python comparison_on_mmnist/jmvae.py --param_file comparison_on_mmnist/config_on
 ```
 
 
-### Evaluate models and compute metrics 
+## Evaluate models and compute metrics 
 
 To compute metrics with the pretrained models available on Hugging Face Hub, you will need to install huggingface :
 
@@ -62,7 +64,7 @@ python comparison_on_mmnist/eval_hf_models.py --param_file comparison_on_mmnist/
 ```
 
 You can choose the configuration file and the name of the model, in order to download the chosen model from the Hub. 
-Possible options for models : JMVAE, MMVAE, MVAE,MoPoE, MVTCAE, JNF, JNFDcca. Once again be careful that for joint encoder models, only the configurations in `config_only_incomplete`are possible.
+Possible options for models : JMVAE, MMVAE, MVAE,MoPoE, MVTCAE, JNF, JNFDcca. Once again be careful that for joint encoder models, only the configurations in `config_only_incomplete` are possible.
 
 You can also run the evaluation for a model trained on your own, using the `eval_local_models.py` script. 
 You just need to provide the path to your trained model at the beginning of the file:
@@ -88,7 +90,14 @@ Make sure to download pretrained classifiers for evaluation whenever it is neede
 ### How to run experiments ?
 
 For each model, and experiment file and a validate file are available. 
-In the validate.py file, by default a pretrained model is loaded from the HuggingFace Hub but you can provide the path to your locally trained model
+The experiment script has the name of the dataset it uses. 
+For instance, to run the experiment used to reproduce jmvae, move into the *nips_experiments* folder and run:
+```python 
+python reproducing_results/jmvae/mnist.py
+```
+
+
+In the validate.py file,a pretrained model is loaded from the HuggingFace Hub by default, but you can provide the path to your locally trained model
 instead. 
 ```python
 model = AutoModel.load_from_hf_hub("asenella/reproduce_jmvae_seed_1", allow_pickle=True)
@@ -99,7 +108,7 @@ model = AutoModel.load_from_hf_hub("asenella/reproduce_jmvae_seed_1", allow_pick
 
 If you want to use wandb to monitor the experiments, you can uncomment the lines setting up the wandb callback in each file:
 ```python
-# If you want to use wandb, uncomment the line below
+# If you want to use wandb, uncomment the lines below
 callbacks=None
 # wandb_ = WandbCallback()
 # wandb_.setup(training_config, model_config, project_name="reproduce_jmvae")
