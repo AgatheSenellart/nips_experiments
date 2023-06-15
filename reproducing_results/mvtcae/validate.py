@@ -80,4 +80,4 @@ model = AutoModel.load_from_hf_hub(
 
 coherences = CoherenceEvaluator(model, clfs, test_set, None).eval()
 
-fids = FIDEvaluator(model,test_set).mvtcae_reproduce_fids(gen_mod='m0')
+fids = FIDEvaluator(model,test_set).compute_all_conditional_fids(gen_mod='m0')
