@@ -14,7 +14,10 @@ import json
 from config import *
 from multivae.metrics.reconstruction import Reconstruction, ReconstructionConfig
 from multivae.metrics import FIDEvaluator, FIDEvaluatorConfig
-import wandb
+try:
+    import wandb
+except:
+    pass
 from multivae.data.datasets import MultimodalBaseDataset
 import torch
 from pythae.models import AutoModel as pythae_automodel

@@ -140,3 +140,57 @@ callbacks = None
 # wandb_cb.run.config.update(args.__dict__)
 # callbacks = [TrainingCallback(), ProgressBarCallback(), wandb_cb]
 ```
+
+# Experiments on the complete MHD dataset
+
+We provide scripts for training all models on the complete MHD dataset. To run them, move into the nips_experiments folder and run:
+```bash 
+
+python comparison_on_MHD/jmvae.py --param_file comparison_on_MHD/config_files/f1.json
+```
+You can change the configuration file number (f2.json, f3.json), to change parameters (beta, use_likelihood_rescaling...) and the name of the model. 
+
+Once again, if you wish to use wandb, uncomment the following lines in the `jmvae.py`file (or the file corresponding to the model you are training):
+
+```python
+##### Set up callbacks: Uncomment the following lines to use wandb
+callbacks = None
+# wandb_cb = WandbCallback()
+# wandb_cb.setup(trainer_config, model_config)
+# wandb_cb.run.config.update(args.__dict__)
+# callbacks = [TrainingCallback(), ProgressBarCallback(), wandb_cb]
+```
+
+In order to compute metrics for the trained models, make sure you have downloaded the pretrained classifiers from https://github.com/miguelsvasco/nexus_pytorch and placed them in the ../data/MHD/classifiers.
+
+
+# Experiments on the incomplete MHD dataset
+
+We provide scripts for training all models on the incomplete MHD dataset. To run them, move into the nips_experiments folder and run:
+```bash 
+
+python comparison_on_incomplete_MHD/jmvae.py --param_file comparison_on_incomplete_MHD/config_files/f1.json
+```
+You can change the configuration file number (f2.json, f3.json), to change parameters (beta, use_likelihood_rescaling...) and the name of the model. 
+
+Once again, if you wish to use wandb, uncomment the following lines in the `jmvae.py`file (or the file corresponding to the model you are training):
+
+```python
+##### Set up callbacks: Uncomment the following lines to use wandb
+callbacks = None
+# wandb_cb = WandbCallback()
+# wandb_cb.setup(trainer_config, model_config)
+# wandb_cb.run.config.update(args.__dict__)
+# callbacks = [TrainingCallback(), ProgressBarCallback(), wandb_cb]
+```
+
+In order to compute metrics for the trained models, make sure you have downloaded the pretrained classifiers from https://github.com/miguelsvasco/nexus_pytorch and placed them in the ../data/MHD/classifiers.
+
+
+For both examples above, we provide scripts for computing metrics on the pretrained models hosted one HuggingFace. 
+For instance, you can use the `plot_samples_mhd.ipynb` notebook to generate some samples and visualize them. 
+
+
+# Contact
+
+If you have any question, don't hesitate to reach out at agathe.senellart@inria.fr !

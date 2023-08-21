@@ -8,7 +8,6 @@ from multivae.trainers.base.callbacks import (
     WandbCallback,
 )
 import json
-from compute_mfd import compute_mfd
 
 wandb_project = 'MHD'
 config_name = 'mhd_config_1'
@@ -101,7 +100,6 @@ def eval(path,model, classifiers, wandb_path):
         recon_module.log_to_wandb()
         recon_module.finish()
         
-    compute_mfd(model, wandb_path,path)
     
 
 def save_to_hf(model, args):

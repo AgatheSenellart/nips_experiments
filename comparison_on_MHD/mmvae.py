@@ -58,12 +58,17 @@ train, val = random_split(train_set, [0.9,0.1], generator=torch.Generator().manu
 
 
 
-# Set up callbacks
-wandb_cb = WandbCallback()
-wandb_cb.setup(trainer_config, model_config, project_name=wandb_project)
-wandb_cb.run.config.update(args.__dict__)
 
-callbacks = [TrainingCallback(), ProgressBarCallback(), wandb_cb]
+callbacks = None
+
+# Set up callbacks : uncomment this to use wandb (make sure it is installed)
+
+# wandb_cb = WandbCallback()
+# wandb_cb.setup(trainer_config, model_config, project_name=wandb_project)
+# wandb_cb.run.config.update(args.__dict__)
+
+# callbacks = [TrainingCallback(), ProgressBarCallback(), wandb_cb]
+
 
 trainer = BaseTrainer(
     model = model, 

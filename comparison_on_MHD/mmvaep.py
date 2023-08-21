@@ -102,12 +102,16 @@ train, val = random_split(train_set, [0.9,0.1], generator=torch.Generator().manu
 
 
 
-# Set up callbacks
-wandb_cb = WandbCallback()
-wandb_cb.setup(trainer_config, model_config, project_name=wandb_project)
-wandb_cb.run.config.update(args.__dict__)
+callbacks = None
 
-callbacks = [TrainingCallback(), ProgressBarCallback(), wandb_cb]
+# Set up callbacks : uncomment this to use wandb (make sure it is installed)
+
+# wandb_cb = WandbCallback()
+# wandb_cb.setup(trainer_config, model_config, project_name=wandb_project)
+# wandb_cb.run.config.update(args.__dict__)
+
+# callbacks = [TrainingCallback(), ProgressBarCallback(), wandb_cb]
+
 
 trainer = BaseTrainer(
     model = model, 
@@ -122,8 +126,7 @@ trainer.train()
 model = trainer._best_model
 
 # Push to HuggingFaceHub
-model.push_to_hf_hub(f'asenella/{model.model_name}_beta_{int(args.beta*10)}_scale_{args.use_rescaling}_seed_{args.seed}')
-
+save_to_hf(model, args)
 
 
 # Validate
