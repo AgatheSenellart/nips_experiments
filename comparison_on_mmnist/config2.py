@@ -24,6 +24,7 @@ from multivae.trainers.base.callbacks import (
     TrainingCallback,
     WandbCallback,
 )
+import os
 
 # The path to download and store the data, classifiers and inception network for FID.
 data_path = './data'
@@ -113,7 +114,7 @@ class ClfImg(nn.Module):
         return h
 
 
-def load_mmnist_classifiers(data_path='./data/clf', device="cuda"):
+def load_mmnist_classifiers(data_path=os.path.join(data_path,'clf'), device="cuda"):
     clfs = {}
     for i in range(5):
         fp = data_path + "/pretrained_img_to_digit_clf_m" + str(i)
@@ -143,9 +144,10 @@ def eval_model(model, output_dir, test_data, wandb_path):
         eval_config=config,
     ).eval()
 
-    config = FIDEvaluatorConfig(batch_size=512, wandb_path=wandb_path)
+    config = FIDEvaluatorConfig(batch_size=512, wandb_path=wandb_path,
+                                inception_weights_path=os.path.join(data_path,'pt_inception-2015-12-05-6726825d.pth'))
 
     # Cross-modal FIDs
     FIDEvaluator(
         model, test_data, output=output_dir, eval_config=config
-    ).mvtcae_reproduce_fids(gen_mod="m0")
+    ).compute_all_conditional_fids(gen_mod="m0")

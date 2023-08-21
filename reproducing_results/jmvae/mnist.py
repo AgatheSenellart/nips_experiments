@@ -201,7 +201,7 @@ training_config = BaseTrainerConfig(
     output_dir='./reproduce_jmvae'
 )
 
-# If you want to use wandb, uncomment the line below
+# If you want to use wandb, uncomment the lines below
 callbacks=None
 # wandb_ = WandbCallback()
 # wandb_.setup(training_config, model_config, project_name="reproduce_jmvae")

@@ -87,11 +87,13 @@ for i in range(2,5):
 vis_module.finish()
 
 # Compute confiditional FIDs
-fid_config = FIDEvaluatorConfig(batch_size=128)
+fid_config = FIDEvaluatorConfig(batch_size=128,
+                                inception_weights_path=os.path.join(data_path,'pt_inception-2015-12-05-6726825d.pth'))
+
 
 FIDEvaluator(
         model, test_set, output=output_dir, eval_config=fid_config
-    ).mvtcae_reproduce_fids(gen_mod="m0")
+    ).compute_all_conditional_fids(gen_mod="m0")
 
 
 #### Compute joint coherence for other samplers
@@ -127,7 +129,8 @@ for sampler in samplers:
     module_eval.finish()
 
 
-    config = FIDEvaluatorConfig(batch_size=128, inception_weights_path='./data/clf/pt_inception-2015-12-05-6726825d.pth')
+    config = FIDEvaluatorConfig(batch_size=128, 
+                                inception_weights_path=os.path.join(data_path,'pt_inception-2015-12-05-6726825d.pth'))
     module_eval = FIDEvaluator(model,test_set,eval_config=config, sampler=sampler)
     module_eval.eval()
     module_eval.finish()
@@ -148,7 +151,7 @@ c.finish()
 from multivae.metrics import LikelihoodsEvaluator, LikelihoodsEvaluatorConfig
 
 lik_config = LikelihoodsEvaluatorConfig(
-    batch_size=512,
+    batch_size=128,
    
     num_samples=1000,
     batch_size_k=250,

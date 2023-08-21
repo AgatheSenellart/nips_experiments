@@ -144,7 +144,7 @@ class Enc(BaseEncoder):
             lv_w = self.fc_lv_w(out_w)
 
 
-            output['style_embedding'] = self.fc_mu_w(out_w),
+            output['style_embedding'] = self.fc_mu_w(out_w)
             output['style_log_covariance'] = lv_w
 
 
@@ -225,7 +225,7 @@ train_data, eval_data = random_split(
 
 # Define model
 model_config = MMVAEPlusConfig(
-
+    latent_dim=32,
     n_modalities=len(modalities),
     input_dims={k: (3, 28, 28) for k in modalities},
     decoders_dist={k: "laplace" for k in modalities},
@@ -239,12 +239,11 @@ model_config = MMVAEPlusConfig(
     modalities_specific_dim=32,
     reconstruction_option="joint_prior",
 )
-model_config.latent_dim = 32
 
 
 
 encoders = {
-    m: Enc(model_config.modalities_specific_dim, ndim_u=model_config.latent_dim)
+    m: Enc(ndim_w=model_config.modalities_specific_dim, ndim_u=model_config.latent_dim)
     for m in modalities
 }
 decoders = {
