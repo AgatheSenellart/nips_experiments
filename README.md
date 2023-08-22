@@ -76,7 +76,7 @@ and then run
 python comparison_on_mmnist/eval_local_models.py 
 ```
 
-# Reproduce experiments 
+# Reproduced experiments from the original papers 
 
 ## Setup
 Make sure to download pretrained classifiers for evaluation whenever it is needed and place it in the `nips_experiments/data` folder.
